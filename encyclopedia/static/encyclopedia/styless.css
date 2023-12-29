@@ -1,0 +1,65 @@
+body {
+    margin: 0;
+    background-color: white;
+}
+
+code {
+    white-space: pre;
+}
+
+h1 {
+    margin-top: 0px;
+    padding-top: 20px;
+}
+
+textarea {
+    height: 80vh;
+    width: 80%;
+}
+
+.main {
+    padding: 10px;
+}
+
+.search {
+    width: 100%;
+    font-size: 15px;
+    line-height: 15px;
+}
+
+.sidebar {
+    background-color: #f0f0f0;
+    height: 100vh;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    margin-top: 5px;
+}
+
+form.new_page_form {
+    padding: 10px;
+    font-family: sans-serif, Helvetica, ;
+}
+ label {
+    font-size: 20px;
+}
+
+form.new_page_form input, textarea {
+    padding-left: 10px;
+}
+
+.form_button {
+    background-color: rgb(0, 117, 250);
+    color: aliceblue;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 2px 2px 3px rgb(116, 149, 187);
+    transition: opacity 0.3s;
+    
+}
+.form_button:hover {
+    opacity: 0.9;
+}
+
+

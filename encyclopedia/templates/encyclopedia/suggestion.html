@@ -1,0 +1,17 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    suggestions
+{% endblock %}
+
+{% block body %}
+    <h2>some suggestions for what you are looking for...</h2>
+    <br>
+    <ul>
+        {% for suggest in pages_in_suggestion %}
+        <li><a href="{% url 'entry_page' page_title=suggest %}">{{ suggest }}</a></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+
