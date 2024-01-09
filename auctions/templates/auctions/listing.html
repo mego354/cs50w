@@ -1,0 +1,123 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% if message %}
+    <div class="listing_error">
+       <h2>{{ message }}</h2>
+   </div>
+{% endif %}
+
+{% if message2 %}
+    <div class="listing_success">
+       <h2>{{ message2 }}</h2>
+   </div>
+{% endif %}
+
+  <h2 style="text-align: center;">listing: {{ listing.title }}</h2>
+
+  {%if listing.winner == request.user%}
+  <div class="listing_success">
+    <h2 style="text-align: center; ">Congratulations <strong>{{ listing.winner }}</strong></h2>
+  </div>
+
+  {% endif %}
+
+
+    <div class="card mb-3" style="width: 60%; margin-left: 20%;">
+        <img class="card-img-top" src="{{ listing.image_url }}" alt="listing image" style="min-height: 320px;">
+        <div class="card-body">
+          <h5 class="card-title">{{ listing.description }}</h5>
+
+            {%if listing.winner %}
+                <p class="card-text" style="margin-bottom: 2px;">Final price: {{ listing.current_price }}</p>
+                <p class="card-text" class="text-muted">original price: {{ listing.price }}</p>
+                {%if not request.user.is_authenticated %}
+                <p class="card-text">Sold! you can know the winner but <a href="{% url 'login' %}">log in</a> first</strong></p>
+
+                {% else %}
+                
+                <p class="card-text">Sold for <strong>{{ listing.winner }}</strong></p>
+
+                {% endif %}
+            {% else %}
+                <p class="card-text" style="margin-bottom: 2px;">Current price: {{ listing.current_price }}</p>
+                <p class="card-text text-muted" >original price: {{ listing.price }}</p>
+
+                {%if request.user.is_authenticated %}
+                    <div class="listing_authenticated">
+                        <div class="div_listing_authenticated">
+                            <form action="{% url 'listing' listing.id %}" method="post">
+                                {% csrf_token %}
+                                <div class="div_child">
+                                    <label for="bid">place a bid:</label>
+                                    <input class="form-control" class="first_input" type="number" name="bid" placeholder="$" min={{listing.current_price}} required>
+                                    <input class="btn btn-primary" class="second_input" type="submit" value="Bid">
+                                </div>
+                            </form>
+                        </div>
+                        {% if owner %}
+                        <div>
+                            <a href="{% url 'sell' listing.id %}">Sell to the highest bid ? </a>
+                        </div>
+    
+                        {% else %}
+                        <div>
+                            <a href="{% url 'add' listing.id %}">Add to your Watchlist</a>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+                                            
+
+                {% else %}
+                <p class="card-text " >If you want to place a bid please <a href="{% url 'login' %}">log in</a> first</p>
+
+                {% endif %}
+
+
+            {% endif %}
+
+        </div>
+        {%if request.user.is_authenticated %}
+
+            <div>
+                <form action="{% url 'comment' listing.id%}" method="post" >
+                    {% csrf_token %}
+                    <div class="sec_div">
+                        <textarea class="form-control" id="description" rows="10" name="comment" placeholder="Give an opinion about that listing" required></textarea>
+                        <input class="btn btn-primary" type="submit" value="Leave a comment">
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        <div style="margin-top: 15px">
+            {% for comment in comments %}
+                <div class="card">
+                    <div class="card-header">
+                    <strong>{{comment.user}}</strong> Said about {{ comment.listing.title }}
+                    </div>
+                    <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <p>{{ comment.text }}</p>
+                        {% if listing.owner == comment.user %}
+                        <footer class="blockquote-footer">Listing owner</footer>
+                        {% elif listing.winner == comment.user %}
+                        <footer class="blockquote-footer">Listing winner</footer>
+                        {% else %}
+                        <footer class="blockquote-footer">special buyer</footer>
+                        {% endif %}
+
+
+
+                    </blockquote>
+                    </div>
+                </div>
+            {% endfor %}
+        <div>
+
+    </div>
+
+
+{% endblock %}

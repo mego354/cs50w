@@ -1,0 +1,79 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {%if current_category %}
+    <h2>All listings for {{ current_category.name }}</h2>
+    {% else %}
+    <h2>Active Listings</h2>
+    {% endif %}
+    <form action="{% url 'index' %}" method="post" class="index_form">
+
+        {% csrf_token %}
+
+        <label for="category">View by category:</label>
+        <select name="category" class="form-select">
+            {% if current_category%}
+
+                <option value="{{ current_category.name }}"selected>{{ current_category }}</option>
+                {% for category_id in categories %}
+                    <option value={{ category_id.name }}>{{ category_id }}</option>
+                {% endfor %}
+
+            {% else %}
+
+                <option selected value="all">select a Category</option>
+                {% for category_id in categories %}
+                <option value={{ category_id.name }}>{{ category_id }}</option>
+                {% endfor %}
+
+            {% endif %}
+
+        </select>    
+
+        <input class="btn btn-primary" type="submit" value="search" style="height: 25px; margin-top: 2px; padding-top: 0; ">
+
+
+    </form>
+
+    <div class="index_display">
+        {% for listing in listings %}
+
+
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="{{listing.image_url}}" alt="listing image">
+                <div class="card-body">
+                    <h5 class="card-title">{{listing.title}}</h5>
+                    <p class="card-text">{{listing.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% if  listing.active %}
+
+                    <li class="list-group-item">Owner: {{listing.owner.username}}</li>
+                    <li class="list-group-item">Current price: ${{listing.current_price}}</li>
+                    <li class="list-group-item">Created at: {{listing.created_at}}</li>
+
+                    {% else %}
+                    <li class="list-group-item"><strong>Sold!</strong></li>
+
+                    {% if  request.user.is_authenticated %}
+                    <li class="list-group-item">winner: {{listing.winner.username}}</li>
+                    {% else %}
+                    <li class="list-group-item"><a href="{% url "login" %}">Log in</a> to know the winner</li>
+                    {% endif %}
+
+                    <li class="list-group-item">Final price: ${{listing.current_price}}</li>
+
+
+                    {% endif %}
+
+                </ul>
+                <div class="card-body">
+                    <a href="{% url 'listing' listing.id %}" class="card-link">View</a>
+                </div>
+            </div>
+
+        {% endfor %}
+
+        
+    </div>
+{% endblock %}

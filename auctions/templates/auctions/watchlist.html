@@ -1,0 +1,44 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Your watchlist</h2>
+    <div class="index_display">
+        {% for listing in watchlists %}
+
+
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="{{listing.image_url}}" alt="listing image">
+                <div class="card-body">
+                    <h5 class="card-title">{{listing.title}}</h5>
+                    <p class="card-text">{{listing.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% if  listing.active %}
+
+                    <li class="list-group-item">Owner: {{listing.owner.username}}</li>
+                    <li class="list-group-item">Current price: ${{listing.current_price}}</li>
+                    <li class="list-group-item">Created at: {{listing.created_at}}</li>
+
+                    {% else %}
+                    <li class="list-group-item"><strong>Sold!</strong></li>
+                    <li class="list-group-item">winner: {{listing.winner.username}}</li>
+                    <li class="list-group-item">Final price: ${{listing.current_price}}</li>
+
+
+                    {% endif %}
+
+                </ul>
+                <div class="card-body">
+                    <a href="{% url 'listing' listing.id %}" class="card-link">View</a>
+                    <a href="{% url 'remove' listing.id %}" class="card-link">Remove from watch list</a>
+                </div>
+            </div>
+        {% empty %}
+        <h2 style="color: red">is empty</h2>
+
+        {% endfor %}
+
+        
+    </div>
+
+{% endblock %}
