@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .util import get_entry, save_entry, list_entries
 from markdown2 import markdown
 from django import forms
@@ -50,9 +50,9 @@ def new_page(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
-            if get_entry(title):
+            if get_entry(title) and html_code(title) == markdown(content):
                 return render(request, "encyclopedia/error.html", {
-                    "text": f" - {title} -  page already exist"
+                    "text": f" - {title} -  page already exist with the same entry"
                 })
             else:
                 save_entry(title.capitalize(), content)
