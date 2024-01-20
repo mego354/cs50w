@@ -1,0 +1,42 @@
+textarea {
+    min-height: 400px;
+}
+
+
+
+
+.each_email {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 10px;
+    padding-bottom: 2px;
+    margin-bottom: 10px;
+    font-weight: 400;
+
+}
+
+
+.each_email div {
+    display: flex;
+    flex-direction: row;
+
+}
+.each_email div h5 {
+    margin-right: 15px;
+}
+.email_body{
+    padding: 5px;
+    padding-top: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: lighter;
+    background-color: aliceblue;
+}
+
+.buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
