@@ -1,0 +1,183 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block body %}
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page"> {{shahr}}</li>
+        <li class="breadcrumb-item active" aria-current="page"> {{year}}</li>
+        <li class="breadcrumb-item"><a href="{% url 'main:total_orders' %}"> المبيعات</a></li>
+    </ol>
+</nav>
+
+    <h1 class="list-group-item" style="text-align: center;color: rgb(48, 82, 82); margin-bottom: 10px;">
+        <i class="fa-solid fa-chart-line fa-flip-horizontal" style="color: #003ca3;"></i>
+        خلال شهر {{ shahr }}
+    </h1>
+
+    <div class="accordion-body" style="display: grid; grid-template-columns: 50% 40%; column-gap: 10%;">
+        <div>
+            <canvas id="month_chart" width="800" height="400"></canvas>
+        </div>  
+
+        <div>
+            <ul class="list-group list-group-flush" style="text-align: right; font-family: Roboto arial; font-size: 19px;">
+                <br>
+                <li class="list-group-item  ">{{ month_data.order_count }}  عدد الطلبات </li>
+                <li class="list-group-item"></li>
+                <br>
+
+                <li class="list-group-item  ">{{ month_data.orders_sales }}  اجمالي مبيعات </li>
+                <li class="list-group-item"></li>
+                <br>
+
+                <li class="list-group-item  ">{{ month_data.average_order }}  متوسط سعر الطلب</li>
+                <li class="list-group-item"></li>
+                <br>
+
+                <li class="list-group-item  ">{{ month_data.debt }}  اجمالي الآجل من المبيعات</li>
+                <li class="list-group-item"></li>
+                <br>
+
+                <li class="list-group-item  ">{{ month_data.profit }}  اجمالي الربح من المبيعات</li>
+                <li class="list-group-item"></li>
+                <br>
+
+                <li class="list-group-item  ">{{ month_data.coming_sales }}  اجمالي سعر الطلبيات  </li>
+                <li class="list-group-item"></li>
+                <br>
+
+                <li class="list-group-item  ">{{ month_data.coming_debt }}  اجمالي آجل للطلبيات </li>
+                <li class="list-group-item"></li>
+                <br>
+            </ul>
+        </div>
+    </div>
+
+{% comment %}                   orders                                     {% endcomment %}
+    <div class="display_users_body">
+    
+        <div class="display_users">
+            <h2>جميع الاوردرات خلال الشهر<h2>
+                <hr>
+            <ul style="line-height:150%; list-style-type:none;">
+                {% for order in month_data.orders %}
+                <li>
+                    <a dir="rtl" lang="ar" class="submit_button" href={% url 'main:order_info' order.id %}>
+                        {% if not order.customer.is_shop %}
+                        {{order.id}}# للعميل {{ order.customer.name }} بتاريخ {{ order.created_at|date:"d/m/y" }}
+                        {% else %}
+                        {{order.id}}# الي فرع {{ order.customer.name }} بتاريخ {{ order.created_at|date:"d/m/y" }}
+                        {% endif %}
+
+                        {% if order.is_fully_paid %}
+                        <i class="fa-regular fa-circle-check"></i>
+                        {% else %}
+                        <i class="fa-regular fa-circle-xmark"></i>
+                        {% endif %}
+                </a>
+            </li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="display_users">
+            <h2>جميع الطلبيات خلال الشهر<h2>
+                <hr>
+            <ul style="line-height:150%; list-style-type:none;">
+                {% for order in month_data.coming_orders %}
+                    <a dir="rtl" lang="ar" class="submit_button" href={% url 'main:coming_order_info' order.id %}>
+                        {{order.id}}# لحساب فرع {{ order.customer.name }} بتاريخ {{ order.created_at|date:"d/m/y" }}
+                        {% if order.is_fully_paid %}
+                        <i class="fa-regular fa-circle-check"></i>
+                        {% else %}
+                        <i class="fa-regular fa-circle-xmark"></i>
+                        {% endif %}
+
+                    </a>
+                </li>
+        {% endfor %}
+            </ul>
+        </div>
+
+
+
+    </div>
+{% comment %}                   debt                                     {% endcomment %}
+    <div id="debt_char" style="width: auto; height: 500px;"></div>
+{% comment %}                   script                                     {% endcomment %}
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Category');
+            data.addColumn('number', 'Value');
+            data.addRows([
+                {% for name, value in debt_char_data.items %}
+                ['{{ name }}', {{ value }}],
+                {% endfor %}
+            ]);
+
+            var options = {
+                is3D: true,
+                slices: { 
+                    0: {offset: 0.1}
+                }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('debt_char'));
+            chart.draw(data, options);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var ctx = document.getElementById('month_chart').getContext('2d');
+        
+            var chartData = {
+                labels: [{% for name, value in month_char_data.items %}"{{ name }}", {% endfor %}],
+                datasets: [{
+                    label: 'My Dataset',
+                    data: [{% for name, value in month_char_data.items %}{{ value }}, {% endfor %}],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+        
+            var chartOptions = {
+                responsive: true, 
+                maintainAspectRatio: false, 
+                scales: {
+                    y: {
+                        beginAtZero: true 
+                    }
+                }
+            };
+        
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: chartOptions
+            });
+        });
+    </script>
+{% endblock %}

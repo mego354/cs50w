@@ -1,0 +1,63 @@
+
+
+{% extends "main/layout.html" %}
+
+{% block body %}
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">عميل جديد</li>
+      <li class="breadcrumb-item active" aria-current="page">الأضافات</li>
+    </ol>
+</nav>
+  
+{% if err_message %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+    <div>
+        {{ err_message }}
+    </div>
+  </div>  
+  {% elif success_message %}
+  <div class="alert alert-success d-flex align-items-center" role="alert" style="display: flex; justify-content: center;">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+    <div style="font-size: 20px;">
+      {{ success_message }}
+    </div>
+  </div>
+{% endif %}
+
+<div class="container mt-5 mb-5 d-flex justify-content-center creating_item">
+    <div class="card">
+        <div class="card-body">
+            <h1>أضافة عميل جديد</h1>
+            <hr>
+            <form action="{% url 'main:create_customer' %}" method="post">
+                {% csrf_token %}
+
+                    <div class="form_label">
+                        <label>: اسم العميل</label>
+                    </div>
+                    {{ form.name }}
+
+
+                    <div class="form_label">
+                        <label>: رقم الهاتف</label>
+                    </div>
+                    {{ form.number }}
+
+                    <div class="form-check form-switch" style="display: flex; gap: 0 10px; justify-content: end; padding-right: 8px;">
+                        {{ form.is_supplier }}
+                        <label style="font-size: 20px;">مورد ؟ </label>
+                    </div>
+
+                  
+                <div class="form_button">
+                <button type="submit" class="btn btn-outline-success">تسجيل</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

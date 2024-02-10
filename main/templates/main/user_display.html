@@ -1,0 +1,160 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block body %}
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        {% if customer.is_shop %}
+      <li class="breadcrumb-item"><a href="{% url 'main:store_coming_info' customer.id %}"> طلبيات الفرع</a></li>
+        {% elif customer.is_supplier %}
+      <li class="breadcrumb-item"><a href="{% url 'main:supplier_coming_info' customer.id %}"> طلبيات المورد</a></li>
+        {% endif %}
+      <li class="breadcrumb-item active" aria-current="page">{{ customer.name }} </li>
+      <li class="breadcrumb-item"><a href="{% url 'main:users' %}">العملاء والطلبات</a></li>
+    </ol>
+</nav>
+
+{% if not orders %}
+
+    <div class="error">
+    <h1>لا يوجد اي طلبات للعميل </h1>
+    <h2>{{ customer.name }}</h2>
+    <br>
+    <a href="{% url 'main:users' %}" class="submit_button">ابحث عن عميل اخر</a>
+    </div>
+{% else %}
+  
+
+    <div class="progress">
+        <div id="percent" class="progress-bar progress-bar-striped progress-bar-animated " role="progressbar" data-percent={{ percent }} aria-valuenow={{ percent }} aria-valuemin="0" aria-valuemax="100" style="width: {{percent}}%">{{percent}}%</div>
+    </div>
+    <table class="table caption-top table-bordered border-info" id="user_orders_table">
+        {% if customer.is_shop %}
+        <caption style="text-align: right;" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">
+            {{customer.name}} طلبيات مباعة من فرع
+        </caption>
+        {% elif customer.is_supplier %}
+        <caption style="text-align: right;" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">
+            {{customer.name}} طلبيات مباعة الي المورد
+        </caption>
+        {% else %}
+        <caption style="text-align: right;" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">
+            {{customer.name}} طلبيات العميل
+        </caption>
+
+        {% endif %}
+
+
+        <thead class="table-light">
+            <tr>
+            <th class="table_left" scope="col" style="border-left-color: rgb(185, 185, 185);">#</th>
+            <th class="table_mid_left" scope="col">السعر</th>
+            <th class="table_mid_right" scope="col">الحالة</th>
+            <th class="table_right" scope="col">يوم</th>
+            </tr>
+        </thead>
+        {% for year, months in arranged_orders.items %}
+
+            <tr>
+                <td style="border-style: none;"colspan="4">&nbsp;</td>
+            </tr>
+            
+            <tr data-code="year_{{year}}" class="year">
+                <td colspan="4" style="text-align: center; font-weight: bold; border-style: none;">
+                    <span class="toggle-icon" data-toggle="year_{{year}}">
+                        <i class="fas fa-eye"></i> <!-- Font Awesome eye icon for visibility -->
+                    </span>
+            
+                    السنة -- 20{{ year }}
+                </td>
+            </tr> 
+                    
+            <tbody id="year_{{year}}">
+
+
+                {% for month, days in months.items %}
+                
+                    <tr class="month" data-code="month_{{year}}{{month}}">
+                        <td colspan="4" style="font-weight: bold; border-style: none;">
+                            <span class="toggle-icon" data-toggle="month_{{year}}{{month}}">
+                                <i class="fa-solid fa-angle-down"></i>
+                            </span>
+
+                            {{ month|add:0 }}
+                        </td>
+                        
+                    </tr> 
+
+                    {% for day, orders in days.items %}
+
+                        {% for order in orders %}
+                            
+                            <tr class="month_{{year}}{{month}}">
+                                <th scope="row" class="table_left container_order_id_link" style="border-left-color: rgb(0, 238, 255);">
+                                    <a class="submit_button order_id_link " href={% url 'main:order_info' order.id %}>{{ order.id }}</a>
+                                </th>
+                                <td class="table_mid_left">{{ order.total_order_price }}</td>
+
+                                {% if  order.is_fully_paid %}
+                                <td class="table_mid_right">مدفوع بالكامل</td>
+                                {% else %}
+                                <td class="table_mid_right">{{ order.rest_money }}$ باقي </td>
+                                {% endif %}
+
+                                <td class="table_right">{{ order.created_at|date:"D" }} -{{ day }}-</td>
+                            </tr>
+                    
+                        {%endfor%} 
+
+                    {%endfor%} 
+
+                {%endfor%} 
+
+            </tbody>
+        {%endfor%}
+    </table>
+
+
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" >
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin: 0;"></button>
+                    <h5 class="modal-title" id="exampleModalLabel">اجمالي عدد الطلبات: {{total_orders_info.count}}</h5>
+                </div>
+                <div class="modal-body" style="text-align: right;">
+                    <h1>اجمالي سعر الطلبات: {{total_orders_info.total_money}}</h1>
+                    {% if rest_info.count %}
+                    <h1>اجمالي المبلغ المتيقي : {{rest_info.rest_money}}</h1>
+                    <h1>&#8664; علي اجمالي {{rest_info.count}} طلبية </h1>
+                    {% for order in rest_info.rest_orders%}
+                    <h3>{{ order.rest_money }} &#8656; <a href="{% url 'main:order_info' order.id %}">{{ order.id }}</a></h3>
+                    {% endfor %}
+                    {% else %}
+                    <h1>لا يوجد اي مبالغ آجلة</h1>
+
+                    {% endif %}
+
+                
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">تم</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    
+
+{% endif %}
+
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+    return new bootstrap.Popover(popoverTriggerEl)
+    })
+</script>
+<script src="{% static 'main/table.js' %}"></script>
+
+{%endblock%} 
+
