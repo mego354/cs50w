@@ -1,0 +1,102 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">الطلبيات </li>
+        <li class="breadcrumb-item "><a href="{% url 'main:all_orders' %}">جميع الطلبات</a></li>
+        <li class="breadcrumb-item active" aria-current="page">الأضافات</li>
+      </ol>
+</nav>
+
+<table class="table caption-top table-bordered border-info" id="user_orders_table">
+
+    <thead class="table-light">
+        <tr>
+        <th class="table_left" scope="col" style="border-left-color: rgb(185, 185, 185);">#</th>
+        <th class="table_mid_right" scope="col">السعر</th>
+        <th class="table_right" scope="col">التوقيت</th>
+        <th class="table_mid_left" scope="col">المورد</th>
+        <th class="table_mid_left" scope="col">الفرع</th>
+        </tr>
+    </thead>
+    {% for year, orders in years.items %}
+
+        <tr>
+            <td style="border-style: none;"colspan="5">&nbsp;</td>
+        </tr>
+        
+        <tr data-code="year_{{year}}" class="year">
+            <td colspan="5" style="text-align: center; font-weight: bold; border-style: none;">
+                <span class="toggle-icon" data-toggle="year_{{year}}">
+                    <i class="fas fa-eye"></i> <!-- Font Awesome eye icon for visibility -->
+                </span>
+        
+            {{ year }}
+            </td>
+        </tr> 
+                
+        <tbody id="year_{{year}}">
+
+            {% for order in orders %}
+                
+                <tr>
+                    <th scope="row" class="table_left container_order_id_link" style="border-left-color: rgb(0, 238, 255);">
+                        <a class="submit_button order_id_link " href={% url 'main:coming_order_info' order.id %}>{{ order.id }}</a>
+                    </th>
+                    <td class="table_mid_left">{{ order.total_order_price }}$</td>
+                    <td class="table_right">{{ order.created_at|date:"d/m/Y" }}</td>
+                    <td class="table_mid_right">{{ order.supplier.name }} </td>
+                    <td class="table_mid_right">{{ order.customer.name }} </td>
+
+                </tr>
+        
+            {%endfor%} 
+
+        </tbody>
+
+    {%endfor%}
+
+</table>
+
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+    return new bootstrap.Popover(popoverTriggerEl)
+    })
+
+</script>
+<script >
+document.querySelectorAll('.year').forEach(customer => {
+    customer.addEventListener('click', hide_customer);
+
+})
+
+
+function hide_customer() {
+    let customer = document.querySelector(`#${this.dataset.code}`)
+    var icon = document.querySelector(`.toggle-icon[data-toggle="${this.dataset.code}"] i`);
+
+    if (customer.style.display === "none") {
+        customer.style.display = "table-row-group";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+
+    }
+    else {
+        customer.style.display = "none";
+        customer.scrollIntoView({ behavior: 'smooth' });
+
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+
+    }
+
+}
+
+</script>
+
+{% endblock %}
