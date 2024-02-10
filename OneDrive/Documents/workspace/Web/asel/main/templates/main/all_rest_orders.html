@@ -1,0 +1,118 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+{% if coming %}
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page"> الطلبيات مستحقة الدفع </li>
+      <li class="breadcrumb-item "><a href="{% url 'main:all_rest_orders' %}"> الطلبات الآجلة </a></li>
+      <li class="breadcrumb-item active" aria-current="page">الأضافات</li>
+    </ol>
+</nav>
+
+{% else %}
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item "><a href="{% url 'main:all_rest_coming_orders' %}"> الطلبيات مستحقة الدفع </a></li>
+      <li class="breadcrumb-item active" aria-current="page">الطلبات الآجلة </li>
+      <li class="breadcrumb-item active" aria-current="page">الأضافات</li>
+    </ol>
+</nav>
+{% endif %}
+
+<table class="table caption-top table-bordered border-info" id="user_orders_table">
+
+    <thead class="table-light">
+        <tr>
+        <th class="table_left" scope="col" style="border-left-color: rgb(185, 185, 185);">#</th>
+        <th class="table_mid_left" scope="col">المتبقي</th>
+        <th class="table_mid_right" scope="col">السعر</th>
+        <th class="table_right" scope="col">التوقيت</th>
+        <th class="table_right" scope="col">المورد</th>
+        </tr>
+    </thead>
+    {% for customer, orders in orders.items %}
+
+        <tr>
+            <td style="border-style: none;"colspan="5">&nbsp;</td>
+        </tr>
+        
+        <tr data-code="customer_{{customer.id}}" class="year">
+            <td colspan="5" style="text-align: center; font-weight: bold; border-style: none;">
+                <span class="toggle-icon" data-toggle="customer_{{customer.id}}">
+                    <i class="fas fa-eye"></i> <!-- Font Awesome eye icon for visibility -->
+                </span>
+        
+            {{ customer.name }}
+            </td>
+        </tr> 
+                
+        <tbody id="customer_{{customer.id}}">
+
+            {% for order in orders %}
+                
+                <tr>
+                    <th scope="row" class="table_left container_order_id_link" style="border-left-color: rgb(0, 238, 255);">
+                        {% if coming %}
+                        <a class="submit_button order_id_link " href={% url 'main:coming_order_info' order.id %}>{{ order.id }}</a>
+                        {% else %}
+                        <a class="submit_button order_id_link " href={% url 'main:order_info' order.id %}>{{ order.id }}</a>
+                        {% endif %}
+                    </th>
+                    <td class="table_mid_right">{{ order.rest_money }}$ باقي </td>
+                    <td class="table_mid_left">{{ order.total_order_price }}$</td>
+
+
+                    <td class="table_right">{{ order.created_at|date:"d/m/Y" }}</td>
+
+                    <td class="table_right">{{ order.supplier.name }}</td>
+                </tr>
+        
+            {%endfor%} 
+
+        </tbody>
+
+    {%endfor%}
+
+</table>
+
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+    return new bootstrap.Popover(popoverTriggerEl)
+    })
+
+</script>
+<script >
+document.querySelectorAll('.year').forEach(customer => {
+    customer.addEventListener('click', hide_customer);
+
+})
+
+
+function hide_customer() {
+    let customer = document.querySelector(`#${this.dataset.code}`)
+    var icon = document.querySelector(`.toggle-icon[data-toggle="${this.dataset.code}"] i`);
+
+    if (customer.style.display === "none") {
+        customer.style.display = "table-row-group";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+
+    }
+    else {
+        customer.style.display = "none";
+        customer.scrollIntoView({ behavior: 'smooth' });
+
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

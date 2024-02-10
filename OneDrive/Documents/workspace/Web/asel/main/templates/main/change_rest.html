@@ -1,0 +1,83 @@
+{% extends "main/layout.html" %}
+
+{% block body %}
+
+    {% if err %}
+    <div class="alert alert-danger d-flex alert-warning alert-dismissible fade show" role="alert" style="justify-content: space-between">
+
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div style="font-size: 22px;">
+        {{ err }}
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        
+    </div>
+
+    {% endif %}
+
+{% if order %}
+    <nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">دفع قسط للطلب</li>
+        <li class="breadcrumb-item"><a href="{% url 'main:order_info' order.id%}">{{ order.id }} الطلب رقم </a></li>
+        <li class="breadcrumb-item"><a href="{% url 'main:user' order.customer.id%}">{{ order.customer.name }} </a></li>
+        <li class="breadcrumb-item"><a href="{% url 'main:users' %}">العملاء والطلبات</a></li>
+        </ol>
+    </nav>
+
+
+    {% if order.is_fully_paid %}
+    <div class="alert alert-success d-flex alert-dismissible fade show" role="alert" style="justify-content: space-between">
+
+        <svg class="bi flex-shrink-0 me-2" width="30" height="30" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <div style="font-size: 22px;">
+        ليس عليه اي مبالغ آجله {{ order.customer.name }} الطلب رقم{{ order.id }} للعميل 
+        </div>
+        
+    </div>
+
+    {% else %}
+
+
+        <div class="alert d-flex alert-warning alert-dismissible fade show" role="alert" style="justify-content: space-between">
+
+            <svg class="bi flex-shrink-0 me-2" width="30" height="30" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+            <div style="font-size: 22px;">
+            ولا يمكن التراجع في ذلك {{ order.customer.name }} انت علي وشك دفع قسط للطلب رقم {{ order.id }} للعميل 
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            
+        </div>
+
+
+        <div class="container mt-5 mb-5 d-flex justify-content-center creating_item">
+            <div class="card">
+                <div class="card-body">
+                    <h1>{{ order.customer.name }} </h1>
+                    <hr>
+                    <h1>{{ order.id }} الطلب</h1>
+                    <hr>
+                    <h1>{{ order.rest_money }} المتبقي</h1>
+                    <hr>
+                    <form action="{% url 'main:change_rest' %}?order_id={{ order.id }}" method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <div class="form_label">
+                                <label>: قيمة القسط</label>
+                            </div>
+                            <input class="form-control" type="number" name="rest_money" min="0" max="{{ order.rest_money }}" required>
+                        </div>
+
+
+                        <div class="form_button">
+                        <button type="submit" class="btn btn-outline-success">Confirm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+{% endif %}
+{%endblock%}
