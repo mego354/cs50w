@@ -1,0 +1,113 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+
+  {% if customer %}
+  <nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">أضافة منتج للطلبية </li>
+      <li class="breadcrumb-item"><a href="{% url 'main:coming_order_info' order.id %}">{{ order.id }} طلبية رقم </a></li>
+      <li class="breadcrumb-item"><a href="{% url 'main:coming_order' %}">ادخال طلبية</a></li>    
+      <li class="breadcrumb-item"><a href="{% url 'main:make_order' %}">الصفحة الرئيسية</a></li>    
+    </ol>
+  </nav>
+  
+  <form action="{% url 'main:add_coming_items' order.id %}" method="post">
+
+  {% else %}
+  <nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">ادخال طلبية</li>
+      <li class="breadcrumb-item"><a href="{% url 'main:make_order' %}">الصفحة الرئيسية</a></li>    
+    </ol>
+  </nav>
+
+  <form action="{% url 'main:coming_order' %}" method="post">
+    
+  {% endif %}
+    <div class="categories_contaner">
+      {% csrf_token %}
+
+      {% for category, items in items_object.items  %}
+      <div>
+        <ul class="list-group">
+          <li class="category_header list-group-item list-group-item-light" data-code="{{category}}">
+            <span>{{category}}</span>
+            
+            <span class="toggle-icon" data-toggle="{{category}}">
+              <i class="fa-solid fa-angle-down"></i>
+          </span>
+ 
+          </li>
+        </ul>
+      </div>
+      <div id="{{category}}" class="items_container"> 
+        {% for item in items  %}
+
+
+          <div class="card" style="">
+
+            <div class="card-body" style="padding: 10px;">
+              <h5 class="card-title" style="text-align: center; font-weight: bold;">{{ item.name }}</h5>
+            </div>
+
+
+              <div class="item_number" style=" font-size: 20px; gap: 5px; margin-bottom: 5px;">
+                <input class="input_card" type="number" name="quantity_{{ item.id }}" placeholder="الكمية" value=0 min=0 style="height: 35px;">
+                <div style="padding-top: 8px; font-weight: 500;"> :العدد</div>
+
+              </div>
+            
+            <div class="card-footer" style="text-align: right;">
+              <small class="text-muted stock" data-quantity="{{ item.quantity }}">المخزون الحالي: {{ item.quantity }}</small>
+            </div>
+        
+          </div>
+
+
+        {% endfor %}
+      </div>
+      {% endfor %}
+        
+    </div>
+
+    
+    <div class="makeorder_submit_button">
+
+      {% if customer %}
+      <button class="submit_button" style="margin-bottom: 30px;">{{ customer.name }} أضافة لفرع </button>
+      {% else %}
+
+      <div style="display:grid; grid-template-columns: auto auto;gap: 10px 15px; margin-bottom: 20px; margin-top: 10px;">
+        <label dir="rtl" class="blue" style="font-size: 22px;">المورد :</label>
+        <label dir="rtl" class="blue" style="font-size: 22px;"> الفرع : </label>
+
+        <select name="supplier" class="customer_choice_field form-select" required>
+          {% for supplier in suppliers %}
+            <option value="{{supplier.id}}">{{supplier.id}}- {{supplier.name}}</option>
+          {% endfor %}
+        </select>
+
+        <select name="customer" class="customer_choice_field form-select">
+          {% for customer in customers %}
+            <option value="{{customer.id}}">{{customer.id}}- {{customer.name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+        <button class="submit_button" style="margin-bottom: 30px;">  تسجيل الطلبية</button>
+
+      {% endif %}
+
+      
+    </div>
+  </form>
+
+
+ {% comment %} ################################################################################################## {% endcomment %}
+
+
+
+ <script src="{% static 'main/make.js' %}"></script>
+ {%endblock%}

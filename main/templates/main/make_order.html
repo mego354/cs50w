@@ -1,0 +1,99 @@
+{% extends "main/stander_layout.html" %}
+{% load static %}
+
+{% block option %}
+<a href="{% url 'main:users' %}" class="page_option_buttton" >العملاء والطلبات</a>
+<a href="{% url 'main:make_order' %}" class="page_option_buttton" style="box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);">الصفحة الرئيسية</a>
+<a href="{% url 'main:total_orders' %}" class="page_option_buttton">المبيعات</a>
+{% endblock %}
+
+{% block body %}
+
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'main:coming_order' %}">ادخال طلبية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">الصفحة الرئيسية</li>
+  </ol>
+</nav>
+
+
+  <form action="{% url 'main:make_order' %}" method="post">
+    <div class="categories_contaner">
+      {% csrf_token %}
+
+      {% for category, items in items_object.items  %}
+      <div>
+        <ul class="list-group">
+          <li class="category_header list-group-item list-group-item-light" data-code="{{category}}">
+            <span>{{category}}</span>
+            
+            <span class="toggle-icon" data-toggle="{{category}}">
+              <i class="fa-solid fa-angle-down"></i>
+          </span>
+ 
+          </li>
+        </ul>
+      </div>
+      <div id="{{category}}" class="items_container"> 
+        {% for item in items  %}
+
+
+          <div class="card" style="">
+
+            <div class="card-body" style="padding: 10px;">
+              <h5 class="card-title" style="text-align: right; font-weight: bold;">{{ item.name }}</h5>
+            </div>
+
+            <ul class="list-group list-group-flush" >
+              <li class="list-group-item">السعر : {{ item.market_price }}</li>
+              <li class="list-group-item">الجملة : {{ item.gomla_price }}</li>
+
+              <div class="item_number">
+                <input class="input_card" type="number" name="quantity_{{ item.id }}" placeholder="الكمية" value=0 min=0 max={{ item.quantity }}>
+              </div>
+            </ul>
+            
+            <div class="card-footer" style="text-align: right;">
+              <small class="text-muted stock" data-quantity="{{ item.quantity }}">المخزون: {{ item.quantity }}</small>
+            </div>
+        
+          </div>
+
+
+        {% endfor %}
+      </div>
+      {% endfor %}
+        
+    </div>
+
+    
+    <div class="makeorder_submit_button">
+      <button class="submit_button">تسجيل الطلب</button>
+      <div class="order_rank">
+        <label >ماركت</label>
+        <label >جملة</label>
+        <input type="radio" id="market" name="market_or_gomla" value="market" checked="checked">
+        <input type="radio" id="gomla" name="market_or_gomla" value="gomla">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 85% 15%; padding: 4px;">
+        <select name="customer" class="customer_choice_field form-select">
+          {% for customer in customers %}
+            <option value="{{customer.id}}">{{customer}}</option>
+          {% endfor %}
+        </select>
+        <label dir="rtl" class="blue" style="font-size: 22px;"> العميل : </label>
+      </div>
+
+      <br>
+      
+    </div>
+  </form>
+
+
+ {% comment %} ################################################################################################## {% endcomment %}
+
+
+
+ <script src="{% static 'main/make.js' %}"></script>
+ {%endblock%}
