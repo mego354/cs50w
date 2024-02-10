@@ -1,0 +1,27 @@
+{% extends "main/layout.html" %}
+
+{% block body %}
+<nav style="--bs-breadcrumb-divider: '<';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">تاكيد حذف الطلب </li>
+      <li class="breadcrumb-item"><a href="{% url 'main:order_info' order.id %}">{{ order.id }} الطلب رقم</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'main:user' order.customer.id %}">{{ order.customer.name }} </a></li>
+      <li class="breadcrumb-item"><a href="{% url 'main:users' %}">العملاء والطلبات</a></li>
+    </ol>
+  </nav>
+  
+    <div class="error">
+
+        <h1>برجاء تاكيد حذف الطلب رقم 
+            <a href="{% url 'main:order_info' order.id %}" class="red">{{ order.id }}</a>
+        </h1>
+        <a href="{% url 'main:user' order.customer.id %}" class="submit_button" style="margin-bottom: 10px;">{{ order.customer.name }} للعميل </a>
+
+
+        <form action="{% url 'main:delete_order' order.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="submit_button btn btn-outline-danger" style="background-color: white; color: #ea433b;" value="حذف">
+        </form>
+    </div>
+
+{%endblock%}
