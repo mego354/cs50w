@@ -1,0 +1,37 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+<div class="heading_title top">
+    <h1>Login</h1>
+    <hr style="margin-left: 26%; margin-right: 26%;">
+</div>
+
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div class="login_form">
+            <div class="form-floating">
+                <input autofocus class="form-control shadow-none" type="text" name="username"placeholder="Username">
+                <label style="opacity: 0.7;">Username</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control shadow-none" type="password" name="password" placeholder="Password">
+                <label style="opacity: 0.7;">Password</label>
+            </div>
+            <input class="login_button" type="submit" value="Login">
+            <div class="dont_acc">
+                Don't have an account? <a href="{% url 'register' %}">Register here.</a>
+            </div>
+        </div>  
+    </form>
+
+
+
+    
+
+{% endblock %}

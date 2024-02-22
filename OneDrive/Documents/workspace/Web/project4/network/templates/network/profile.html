@@ -1,0 +1,109 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block body %}
+
+<div class="follow_container">
+    <div class="heading_title">
+        {% if  user.followers.all.count %}
+        <h1 id="page_no">Followers {{ user.followers.all.count }}</h1>
+        {% else %}
+        <h1 id="page_no">No followers yet</h1>
+        {% endif %}
+
+    </div>
+    <div class="heading_title">
+        {% if  user.following.all.count %}
+        <h1 id="page_no">Following {{ user.following.all.count }}</h1>
+        {% else %}
+        <h1 id="page_no">No following yet </h1>
+        {% endif %}
+    </div>
+</div>
+{% if request.user.is_authenticated %}
+{% if not isuser %}
+<form action="{% url 'profile' user.id %}" method="post" class="follow_div">
+{% csrf_token %}
+<button type="submit">
+    {% if request.user in user.followers.all %}
+    Unfollow
+    {% else %}
+    Follow
+    <i class="fa-regular fa-face-smile-wink"></i>
+    {% endif %}
+</button>
+</form>
+{% endif %}
+{% endif %}
+
+    <div id="container">
+
+        <div class="heading_title">
+            <h1 id="page_no">{{ user.username }}'s Posts</h1>
+            <hr>
+    
+        </div>
+
+        {% for post in posts %}
+            <div class="card post" >
+                <div class="card-header">
+                    <div class="name_date">
+                        <div class="poster_info">
+                            {%if post.user.image %}
+                            <a class="poster_img" href="{{ post.user.image.url }}" target="_blank">
+                                <img src="{{post.user.image.url}}" alt="image">
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'profile' post.user.id %}" class="username_link">
+                                <h6>{{ post.user.username }}</h6>
+                            </a>
+                            
+                        </div>
+
+                        <div class="date">
+                            {{ post.date|date:"M d Y - g:i A" }}
+                        </div>
+
+                        <div class="edit_div" id="edit_{{ post.id }}"></div>
+
+                    </div>
+
+                </div>
+                <div class="card-body post_text" data-userid="{{ post.user.id }}" data-postid="{{ post.id }}" style="padding: 0;">
+                    <p class="card-text" id="text_{{post.id}}">{{ post.text }}</p>
+                </div>
+
+                {% if post.image %}
+                <a class="post_image" href="{{ post.image.url }}" target="_blank">
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="post's image">
+                </a>
+                {% endif %}
+                <div class="card-body like_div">
+                    <p class="like_text">
+                        <span id="likes_count_{{post.id}}">{{post.likers.all.count}}</span> 
+                        <span class="likes_text" id="likes_text_{{post.id}}" data-postid={{ post.id }} data-likes="{{post.likers.all.count}}"></span>
+                    </p>
+                    {% if request.user.is_authenticated %}
+                        {%if request.user in post.likers.all %}
+                        <button class="post_likes" id="like_{{ post.id }}" data-postid="{{ post.id }}">
+                            <i id="icon_{{ post.id }}" class="fa-solid fa-heart fa-2x" style="color: #ff0000;"></i>
+                        </button>
+                        {% else %}
+                        <button class="post_likes" id="like_{{ post.id }}" data-postid="{{ post.id }}">
+                            <i id="icon_{{ post.id }}" class="fa-regular fa-heart fa-2x" style="color: #ff0000;"></i>
+                        </button>
+                        {% endif %}
+                    {% endif %}
+                </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+    <script>
+        const currentUserId = "{{ request.user.id }}";
+    </script>
+    <script src="{% static 'network/profile.js' %}">
+    </script>
+
+{% endblock %}
