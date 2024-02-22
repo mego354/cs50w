@@ -1,0 +1,128 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block body %}
+    <div id="container">
+        {% if form %}
+        <form id="new_post_form" action="{% url 'index' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card" id="form_card">
+                <div class="card-header">
+                    <div class="name_date">
+                        <div class="poster_info">
+                            {%if user.image %}
+                            <a class="poster_img" href="{{ user.image.url }}" target="_blank">
+                                <img src="{{ user.image.url }}" alt="image">
+                            </a>
+                            {% endif %}
+                            <h6>{{ request.user.username }}</h6>
+                        </div>
+                        <div class="date">
+                            Create a new post!
+                        </div>
+                        <div class="edit_div">
+                            <button class="next_prev" type="submit" style="font-size: inherit; background-color: inherit;">
+                                Share
+                                <i class="fa-solid fa-share"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating">
+                    {{ form.text }}
+                    <label for="floatingTextarea" style="opacity: 0.7;">Click here ...</label>
+                </div>
+
+                <div class="input-group" id="image_div">
+                    <label id="label_upload" for="image_uploads">
+                         Upload an image!
+                         <i class="fa-regular fa-image"></i>
+                        </label>
+                    {{ form.image }}
+                </div>
+
+            </div>
+        </form>
+        {% endif %}
+
+        <div class="heading_title">
+            <h1 id="page_no"></h1>
+            <hr>
+    
+        </div>
+
+        {% for post in posts %}
+            <div class="card post">
+                <div class="card-header">
+                    <div class="name_date">
+                        <div class="poster_info">
+                            {%if post.user.image %}
+                            <a class="poster_img" href="{{ post.user.image.url }}" target="_blank">
+                                <img src="{{ post.user.image.url }}" alt="image">
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'profile' post.user.id %}" class="username_link">
+                                <h6>{{ post.user.username }}</h6>
+                            </a>
+                            
+                        </div>
+
+                        <div class="date">
+                            {{ post.date|date:"M d Y - g:i A" }}
+                        </div>
+
+                        <div class="edit_div" id="edit_{{ post.id }}"></div>
+
+                    </div>
+
+                </div>
+                <div class="card-body post_text" data-userid="{{ post.user.id }}" data-postid="{{ post.id }}" style="padding: 0;">
+                    <p class="card-text" id="text_{{post.id}}">{{ post.text }}</p>
+                </div>
+
+                {% if post.image %}
+                <a class="post_image" href="{{ post.image.url }}" target="_blank">
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="post's image">
+                </a>
+                {% endif %}
+                <div class="card-body like_div">
+                    <p class="like_text">
+                        <span id="likes_count_{{post.id}}">{{post.likers.all.count}}</span> 
+                        <span class="likes_text" id="likes_text_{{post.id}}" data-postid={{ post.id }} data-likes="{{post.likers.all.count}}"></span>
+                    </p>
+                    {% if request.user.is_authenticated %}
+                        {%if request.user in post.likers.all %}
+                        <button class="post_likes" id="like_{{ post.id }}" data-postid="{{ post.id }}">
+                            <i id="icon_{{ post.id }}" class="fa-solid fa-heart fa-2x" style="color: #ff0000;"></i>
+                        </button>
+                        {% else %}
+                        <button class="post_likes" id="like_{{ post.id }}" data-postid="{{ post.id }}">
+                            <i id="icon_{{ post.id }}" class="fa-regular fa-heart fa-2x" style="color: #ff0000;"></i>
+                        </button>
+                        {% endif %}
+                    {% endif %}
+                </div>
+        </div>
+        {% endfor %}
+        <br>
+        <div class="buttons_div">
+            <button class="next_prev" id="prev">
+                <i id="Previos" class="fa-solid fa-backward" ></i>
+                Previos
+            </button>
+            <button class="next_prev" id="next">
+                Next
+                <i class="fa-solid fa-forward"></i>
+            </button>
+        </div>
+
+    </div>
+
+
+    <script>const currentUserId = "{{ request.user.id }}";</script>
+    <script src="{% static 'network/index.js' %}"></script>
+    {% if form %}
+    <script src="{% static 'network/form.js' %}"></script>
+    {% endif %}
+
+{% endblock %}

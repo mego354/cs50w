@@ -1,0 +1,63 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block body %}
+
+<div class="heading_title top">
+    <h1>Register</h1>
+    <hr style="margin-left: 26%; margin-right: 26%;">
+</div>
+
+
+    {% if message %}
+    <div class="heading_title">
+        <h1 style="color: crimson;">{{ message }}</h1>
+    </div>
+        {% endif %}
+
+    <form action="{% url 'register' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="login_form">
+
+            <div class="form-floating">
+                <input class="form-control" autofocus type="text" name="username" placeholder="Username">
+                <label style="opacity: 0.7;">Username</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" type="email" name="email" placeholder="Email Address">
+                <label style="opacity: 0.7;">Email Address</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" type="password" name="password" placeholder="Password">
+                <label style="opacity: 0.7;">Password</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+                <label style="opacity: 0.7;">Confirm Password</label>
+            </div>
+
+            <div class="input-group" id="prof_image_div">
+                
+                <div id="img_label">Upload profile picture!</div>
+                <div>
+                <label for="profile_pic" id="profile_pic_label">
+                    <i class="fa-regular fa-image fa-2x"></i>
+                </label>
+                </div>
+
+
+                
+                <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
+            </div>
+
+              
+            <input class="login_button" type="submit" value="Register">
+            <div class="dont_acc">
+                Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+            </div>
+        </div>  
+    </form>
+    <script src="{% static 'network/register.js' %}"></script>
+
+
+{% endblock %}
